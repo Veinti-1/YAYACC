@@ -6,6 +6,7 @@ namespace YAYACC
 {
     class Rule
     {
-        public List<Production> Productions { get; set; }
+        public string rName = "";
+        public List<Production> Productions;
     }
 }

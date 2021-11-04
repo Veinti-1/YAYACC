@@ -6,6 +6,6 @@ namespace YAYACC
 {
     class Production
     {
-        List<Element> elements { get; set; }
+        public List<Element> elements;
     }
 }

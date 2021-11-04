@@ -6,7 +6,7 @@ namespace YAYACC
 {
     class Grammar
     {
-        public Rule inicial { get; set; }
-        public List<Rule> Rules { get; set; }
+        public Rule inicial;
+        public List<Rule> Rules;
     }
 }
