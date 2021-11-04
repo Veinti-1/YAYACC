@@ -6,6 +6,7 @@ namespace YAYACC
     {
         static void Main(string[] args)
         {
+            Console.WriteLine("Ingrese ruta del archivo");
             string path = Console.ReadLine();
             string text = System.IO.File.ReadAllText(path);
 
