@@ -8,5 +8,6 @@ namespace YAYACC
     {
         public Rule inicial;
         public List<Rule> Rules;
+        public Dictionary<char, char> Alphabet;
     }
 }

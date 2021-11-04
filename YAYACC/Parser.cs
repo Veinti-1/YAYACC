@@ -122,6 +122,7 @@ namespace YAYACC
                     case TokenType.Term:
                         newElement.type = "Term";
                         newElement.value = nextToken.Value;
+                        newGrammar.Alphabet.TryAdd(Convert.ToChar( nextToken.Value), Convert.ToChar(nextToken.Value));
                         break;
                     default:
                         break;
@@ -139,6 +140,7 @@ namespace YAYACC
         {
             newGrammar = new Grammar();
             newGrammar.Rules = new List<Rule>();
+            newGrammar.Alphabet = new Dictionary<char, char>();
             scanner = new Scanner(regexp + (char)TokenType.EOF);
             nextToken = scanner.GetToken();
             switch (nextToken.Tag)
