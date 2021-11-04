@@ -137,6 +137,7 @@ namespace YAYACC
                                 case '|':
                                 case '}':
                                 case '~':
+                                case ' ':
                                     Tresult.Value += peek;
                                     _currState = 3;
                                     break;

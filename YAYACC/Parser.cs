@@ -20,7 +20,6 @@ namespace YAYACC
                     Match(TokenType.NTerm);
                     Match(TokenType.Colon);
                     newRule.Productions.Add(A());
-
                     try
                     {
                         newRule.Productions.AddRange(B());
@@ -28,11 +27,9 @@ namespace YAYACC
                     catch (Exception)
                     {
                     }
-                    
                     Match(TokenType.Semicolon);
                     newGrammar.Rules.Add(newRule);
                     C();
-                    
                     return newRule;
                 default:
                     throw new Exception("Error de sintaxis");
@@ -45,20 +42,20 @@ namespace YAYACC
             switch (nextToken.Tag)
             {
                 case TokenType.NTerm:
-                    newProduction.elements.Add(Match(TokenType.NTerm)); // IR LLENANDO LA LISTA DE PASOS
+                    newProduction.elements.Add(Match(TokenType.NTerm));
                     try
                     {
-                        newProduction.elements.Add(X().elements[0]);
+                        newProduction.elements.AddRange(X().elements);
                     }
                     catch (Exception)
                     {
                     }
                     return newProduction;
                 case TokenType.Term:
-                    newProduction.elements.Add(Match(TokenType.Term)); // IR LLENANDO LA LISTA DE PASOS
+                    newProduction.elements.Add(Match(TokenType.Term));
                     try
                     {
-                        newProduction.elements.Add(X().elements[0]);
+                        newProduction.elements.AddRange(X().elements);
                     }
                     catch (Exception)
                     {
@@ -151,7 +148,6 @@ namespace YAYACC
                     break;
                 default:
                     throw new Exception("Error de sintaxis");
-                    break;
             }
             Match(TokenType.EOF);
             return newGrammar;

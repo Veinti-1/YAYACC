@@ -6,9 +6,11 @@ namespace YAYACC
     {
         static void Main(string[] args)
         {
-            string regexp = Console.ReadLine();
+            string path = Console.ReadLine();
+            string text = System.IO.File.ReadAllText(path);
+
             Parser prser = new Parser();
-            prser.Parse(regexp);
+            prser.Parse(text);
 
             //Scanner scanner = new Scanner(regexp);
             //Token nextToken = new Token();
