@@ -6,125 +6,111 @@ namespace YAYACC
 {
     class Parser
     {
-        //Scanner scanner;
-        //Token nextToken;
+        Scanner scanner;
+        Token nextToken;
+        Grammar newGrammar;
+        private void S()
+        {
+            switch (nextToken.Tag)
+            {
+                case TokenType.NTerm:
+                    Match(TokenType.NTerm);
+                    Match(TokenType.Colon);
+                    A();
+                    B();
+                    Match(TokenType.Semicolon);
+                    C();
+                    break;
+                default:
+                    //error
+                    break;
+            }
+        }
+        private void A()
+        {
+            switch (nextToken.Tag)
+            {
+                case TokenType.NTerm:
+                    Match(TokenType.NTerm); // IR LLENANDO LA LISTA DE PASOS
+                    X();
+                    break;
+                case TokenType.Term:
+                    Match(TokenType.Term);
+                    X();
+                    break;
+                default:
+                    //error
+                    break;
+            }
+        }
+        private void X()
+        {
+            switch (nextToken.Tag)
+            {
+                case TokenType.NTerm:
+                case TokenType.Term:
+                    A();
+                    break;
+                default:
+                    //retornar nulo
+                    break;
+            }
+        }
 
-        //private double E()
-        //{
-        //    switch (nextToken.Tag)
-        //    {
-        //        case TokenType.Minus:
-        //        case TokenType.Num:
-        //        case TokenType.LParen:
-        //            return T() + EP();
-        //        default:
-        //            throw new Exception("Error de sintaxis");
-        //    }
-        //}
-        //private double EP()
-        //{
-        //    switch (nextToken.Tag)
-        //    {
-        //        case TokenType.Plus:
-        //            Match(TokenType.Plus);
-        //            return T() + EP();
-        //        case TokenType.Minus:
-        //            Match(TokenType.Minus);
-        //            return -T() + EP();
-        //        default:
-        //            return 0.0;
-        //    }
-        //}
-        //private double T()
-        //{
-        //    switch (nextToken.Tag)
-        //    {
-        //        case TokenType.Minus:
-        //        case TokenType.Num:
-        //        case TokenType.LParen:
-        //            return F() * TP();
-        //        default:
-        //            throw new Exception("Error de sintaxis");
-        //    }
-        //}
-        //private double TP()
-        //{
-        //    switch (nextToken.Tag)
-        //    {
-        //        case TokenType.Mult:
-        //            Match(TokenType.Mult);
-        //            return F() * TP();
-        //        case TokenType.Div:
-        //            Match(TokenType.Div);
-        //            return (1 / F()) * TP();
-        //        default:
-        //            return 1.0;
-        //    }
-        //}
-        //private double F()
-        //{
-        //    switch (nextToken.Tag)
-        //    {
-        //        case TokenType.Minus:
-        //            Match(TokenType.Minus);
-        //            return -M();
-        //        case TokenType.Num:
-        //        case TokenType.LParen:
-        //            return M();
-        //        default:
-        //            throw new Exception("Error de sintaxis");
-        //    }
-        //}
-        //private double M()
-        //{
-        //    switch (nextToken.Tag)
-        //    {
-        //        case TokenType.Num:
-        //            return Match(TokenType.Num);
-        //        case TokenType.LParen:
-        //            Match(TokenType.LParen);
-        //            double outE = E();
-        //            Match(TokenType.RParen);
-        //            return outE;
-        //        default:
-        //            return 0.0;//throw new Exception("Error de sintaxis");
-        //    }
-        //}
-        //private double Match(TokenType tag)
-        //{
-        //    double output = 0;
-        //    if (nextToken.Tag == tag)
-        //    {
-        //        if (nextToken.Tag == TokenType.Num)
-        //        {
-        //            output = Convert.ToDouble(nextToken.Value);
-        //        }
-        //        nextToken = scanner.GetToken();
-        //    }
-        //    else
-        //    {
-        //        throw new Exception("Error de sintaxis, Caracter esperado: " + tag);
-        //    }
-        //    return output;
-        //}
+        private void B()
+        {
+            switch (nextToken.Tag)
+            {
+                case TokenType.Pipe:
+                    Match(TokenType.Pipe);
+                    A(); //agregar salida de esta a la lista de opciones de esa regla
+                    B();
+                    break;
+                default:
+                    //retornar nulo
+                    break;
+            }
+        }
+        private void C()
+        {
+            switch (nextToken.Tag)
+            {
+                case TokenType.NTerm:
+                    S();
+                    break;
+                default:
+                    //retornar nulo
+                    break;
+            }
+        }
+        
+        private void Match(TokenType tag)
+        {
+            if (nextToken.Tag == tag)
+            {
+                nextToken = scanner.GetToken();
+            }
+            else
+            {
+                throw new Exception("Error de sintaxis, Caracter esperado: " + tag);
+            }
+        }
 
-        //public double Parse(string regexp)
-        //{
-        //    double output = 0;
-        //    scanner = new Scanner(regexp + (char)TokenType.EOF);
-        //    nextToken = scanner.GetToken();
-        //    switch (nextToken.Tag)
-        //    {
-        //        case TokenType.Minus:
-        //        case TokenType.Num:
-        //        case TokenType.LParen:
-        //            output = E();
-        //            break;
-        //        default:
-        //            break;
-        //    }
-        //    Match(TokenType.EOF);
-        //    return output;
-        //}
+        public Grammar Parse(string regexp)
+        {
+            newGrammar = new Grammar();
+            scanner = new Scanner(regexp + (char)TokenType.EOF);
+            nextToken = scanner.GetToken();
+            switch (nextToken.Tag)
+            {
+                case TokenType.NTerm:
+                    S();
+                    break;
+                default:
+                    //error
+                    break;
+            }
+            Match(TokenType.EOF);
+        }
     }
 }
