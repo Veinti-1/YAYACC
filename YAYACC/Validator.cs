@@ -25,12 +25,47 @@ namespace YAYACC
                         {
                             if (_gram.Rules.Find(x => x.rName == element.value) == null)
                             {
-                                EWlist.Add("ERROR: Inside Rule: " + rule.rName + ", " + element.value + " is not specified inside grammar.");
+                                EWlist.Add("ERROR: Inside Rule: " + rule.rName + ", " + element.value + " is not specified inside the grammar.");
                             }
                         }
                     }
                 }
             }
+            string curRuleName = "";
+            bool found;
+            for (int i = 0; i < _gram.Rules.Count; i++)
+            {
+                found = false;
+                curRuleName = _gram.Rules[i].rName;
+                foreach (var rule in _gram.Rules)
+                {
+                    foreach (var production in rule.Productions)
+                    {
+                        foreach (var element in production.elements)
+                        {
+                            if (element.type == "Nterm" && element.value == curRuleName)
+                            {
+                                found = true;
+                                break;
+                            }
+                        }
+                        if (found)
+                        {
+                            break;
+                        }
+                    }
+                    if (found)
+                    {
+                        break;
+                    }
+                }
+                if (!found)
+                {
+                    EWlist.Add("WARNING: Rule: " + curRuleName + " is never referenced inside the grammar.");
+                }
+            }
+   
+
             return EWlist;
         }
     }
