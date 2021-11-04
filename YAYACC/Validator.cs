@@ -33,7 +33,7 @@ namespace YAYACC
             }
             string curRuleName = "";
             bool found;
-            for (int i = 0; i < _gram.Rules.Count; i++)
+            for (int i = 1; i < _gram.Rules.Count; i++)
             {
                 found = false;
                 curRuleName = _gram.Rules[i].rName;
