@@ -31,14 +31,6 @@ namespace YAYACC
                     
                     Match(TokenType.Semicolon);
                     newGrammar.Rules.Add(newRule);
-
-                    //try
-                    //{
-                    //    newGrammar.Rules.Add(C());
-                    //}
-                    //catch (Exception)
-                    //{
-                    //}
                     C();
                     
                     return newRule;
@@ -61,8 +53,6 @@ namespace YAYACC
                     catch (Exception)
                     {
                     }
-                 
-                    
                     return newProduction;
                 case TokenType.Term:
                     newProduction.elements.Add(Match(TokenType.Term)); // IR LLENANDO LA LISTA DE PASOS
@@ -97,8 +87,7 @@ namespace YAYACC
             {
                 case TokenType.Pipe:
                     Match(TokenType.Pipe);
-                    newProductions.Add(A()); //agregar salida de esta a la lista de opciones de esa regla
-
+                    newProductions.Add(A());
                     try
                     {
                         newProductions.Add(B()[0]);
@@ -106,7 +95,6 @@ namespace YAYACC
                     catch (Exception)
                     {
                     }
-                   
                     return newProductions;
                 default:
                     return null;
@@ -162,7 +150,7 @@ namespace YAYACC
                     newGrammar.inicial = S();
                     break;
                 default:
-                    //error
+                    throw new Exception("Error de sintaxis");
                     break;
             }
             Match(TokenType.EOF);
