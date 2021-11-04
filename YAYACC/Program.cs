@@ -11,18 +11,19 @@ namespace YAYACC
             string text = System.IO.File.ReadAllText(path);
 
             Parser prser = new Parser();
-            prser.Parse(text);
-
-            //Scanner scanner = new Scanner(regexp);
-            //Token nextToken = new Token();
-            //do
-            //{
-            //    nextToken = scanner.GetToken();
-            //    Console.WriteLine("Token: {0}, Valor: {1}", nextToken.Tag, nextToken.Value);
-            //} while (nextToken.Tag != TokenType.EOF);
-
-
-            Console.WriteLine("EXITO");
+           
+            Grammar newGram =  prser.Parse(text);
+            Validator vldtr = new Validator(newGram);
+            int i = 0;
+            foreach (var item in vldtr.validate())
+            {
+                i++;
+                Console.WriteLine(item);
+            }
+            if (i ==0)
+            {
+                Console.WriteLine("No errors found");
+            }
 
             Console.ReadKey();
         }
