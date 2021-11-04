@@ -1,4 +1,5 @@
 ﻿using System;
+using System.IO;
 
 namespace YAYACC
 {
@@ -6,25 +7,31 @@ namespace YAYACC
     {
         static void Main(string[] args)
         {
-            Console.WriteLine("Ingrese ruta del archivo");
+            Console.WriteLine("Enter file path");
             string path = Console.ReadLine();
-            string text = System.IO.File.ReadAllText(path);
-
-            Parser prser = new Parser();
-           
-            Grammar newGram =  prser.Parse(text);
-            Validator vldtr = new Validator(newGram);
-            int i = 0;
-            foreach (var item in vldtr.validate())
+            string extension = Path.GetExtension(path);
+            if (extension == ".y")
             {
-                i++;
-                Console.WriteLine(item);
-            }
-            if (i ==0)
-            {
-                Console.WriteLine("No errors found");
-            }
+                string text = File.ReadAllText(path);
+                Parser prser = new Parser();
 
+                Grammar newGram = prser.Parse(text);
+                Validator vldtr = new Validator(newGram);
+                int i = 0;
+                foreach (var item in vldtr.validate())
+                {
+                    i++;
+                    Console.WriteLine(item);
+                }
+                if (i == 0)
+                {
+                    Console.WriteLine("No errors found");
+                }
+            }
+            else
+            {
+                Console.WriteLine("Incorrect file extension, " + extension +" is not a valid extension");
+            }
             Console.ReadKey();
         }
     }
