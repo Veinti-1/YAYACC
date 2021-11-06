@@ -27,11 +27,14 @@ namespace YAYACC
                 {
                     Console.WriteLine("No errors found");
                 }
+                Console.WriteLine("-------------------");
+                Console.WriteLine(newGram.ToString());
             }
             else
             {
                 Console.WriteLine("Incorrect file extension, " + extension +" is not a valid extension");
             }
+            
             Console.ReadKey();
         }
     }

@@ -12,6 +12,7 @@ namespace YAYACC
             _gram = gram;
         }
 
+      
         public List<string> validate()
         {
             List<string> EWlist = new List<string>();
