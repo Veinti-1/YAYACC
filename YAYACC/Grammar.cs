@@ -98,7 +98,7 @@ namespace YAYACC
                 CheckNodeGen(i);
                 i++;
             } while (i < CLRNodes.Count);
-
+            Console.WriteLine("");
         }
         private void GenerateNode(List<Nvals> Kernels)
         {
@@ -204,7 +204,11 @@ namespace YAYACC
                 }
                 catch (Exception)
                 {
-                    CLRNodes[nodeNum].Movements.Add("$", new Action { pAction = 'R' });
+                    foreach (var item in NodeRule.lookAhead)
+                    {
+                        CLRNodes[nodeNum].Movements.Add(item, new Action { pAction = 'R' });
+                    }
+                    
                 }
             }
             return newKernels;
