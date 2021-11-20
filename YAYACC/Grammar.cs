@@ -12,7 +12,7 @@ namespace YAYACC
         public Dictionary<char, char> Alphabet;
         public Dictionary<string, List<string>> Firsts;
         public List<Node> CLRNodes;
-        int NodeAmount = 0;// inicia en 0
+        int NodeAmount = 0;
 
         public override string ToString()
         {
@@ -191,15 +191,9 @@ namespace YAYACC
                             currAction = 'S';
                             break;
                     }
-                    //if (newGenNval.currPos == newGenNval.myProduction.elements.Count)
-                    //{
-                    //    currAction = 'R';
-                    //}
                     if (newKernels.TryAdd(currVal, new List<Nvals> { newGenNval }))
                     {
                         CLRNodes[nodeNum].Movements.Add(currVal, new Action { pAction = currAction });
-                        //CLRNodes[0].Movements[currVal].direction = NodeAmount;
-                        //NodeAmount++;
                     }
                     else
                     {
@@ -210,28 +204,6 @@ namespace YAYACC
                 {
                     CLRNodes[nodeNum].Movements.Add("$", new Action { pAction = 'R' });
                 }
-               
-
-                
-                //generate = true;
-                //nextNode = 0;
-                //foreach (var node in CLRNodes)
-                //{
-                //    if (node.nRules[0].ToString() == item.GetNext() && node.numNode != CLRNodes[0].numNode)
-                //    {
-                //        nextNode = node.numNode;
-                //        generate = false;
-                //        break;
-                //    }
-                //}
-                //if (generate)
-                //{ 
-                //    CLRNodes[0].Movements.TryAdd(item.myProduction.elements[item.currPos], NodeAmount);
-                //}
-                //else
-                //{
-                //    CLRNodes[0].Movements.TryAdd(item.myProduction.elements[item.currPos], nextNode);
-                //}
             }
             return newKernels;
         }
@@ -265,7 +237,6 @@ namespace YAYACC
                     CLRNodes[nodeNum].Movements[kernel.Key].direction = NodeAmount;
                     GenerateNode(kernel.Value);
                 }
-
             }
         }
 
