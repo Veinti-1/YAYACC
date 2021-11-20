@@ -28,7 +28,7 @@ namespace YAYACC
             }
             return sOutput;
         }
-        public void GenerateFirsts()
+        private void GenerateFirsts()
         {
             Firsts = new Dictionary<string, List<string>>();
             foreach (var rule in Rules)
@@ -59,6 +59,7 @@ namespace YAYACC
 
         public void GenerateCLR()
         {
+            GenerateFirsts();
             CLRNodes = new List<Node>();
             Element newE = new Element
             {
@@ -97,6 +98,7 @@ namespace YAYACC
                 CheckNodeGen(i);
                 i++;
             } while (i < CLRNodes.Count);
+
         }
         private void GenerateNode(List<Nvals> Kernels)
         {
