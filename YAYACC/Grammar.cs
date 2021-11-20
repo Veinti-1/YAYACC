@@ -81,39 +81,38 @@ namespace YAYACC
                 }
             });
 
-           
 
-            GenerateNode(Rules[Rules.Count - 1].rName, newP, 0, new List<string> { "$" });
-            //int i = 1;
-            //do
-            //{
-            //    GenerateNode();
-            //} while (i < CLRNodes.Count);
+            Nvals newNval = new Nvals
+            {
+                ruleName = "0",
+                myProduction = newP,
+                lookAhead = new List<string> { "$" },
+            };
+            GenerateNode(new List<Nvals> { newNval });
+           
+            Console.WriteLine("");
+            int i = 0;
+            do
+            {
+                CheckNodeGen(i);
+                i++;
+            } while (i < CLRNodes.Count);
         }
-        private void GenerateNode(string rName, Production currProd, int pos, List<string> lookAhead)
+        private void GenerateNode(List<Nvals> Kernels)
         {
             Node newNode = new Node
             {
+                Kernels = Kernels,
                 numNode = NodeAmount,
                 nRules = new List<Nvals>(),
-                Movements = new Dictionary<Element, int>()
+                Movements = new Dictionary<string, Action>()
             };
 
             NodeAmount++;
-            Nvals newVals = new Nvals
-            {
-                ruleName = rName,
-                myProduction = currProd,
-                lookAhead = lookAhead,
-                currPos = pos
-            };
-            newNode.nRules.Add(newVals);
+
+            newNode.nRules.AddRange(Kernels);
             CLRNodes.Add(newNode);
 
-            if (newNode.numNode == 23)
-            {
-                Console.WriteLine("3");
-            }
 
             int i = 0;
             do
@@ -164,45 +163,120 @@ namespace YAYACC
             } while (i < newNode.nRules.Count);
 
 
-            if (newNode.numNode == 3)
-            {
-                Console.WriteLine("3");
-            }
 
-            bool generate;
-            int nextNode;
-            foreach (var item in newNode.nRules)
+        }
+
+        private Dictionary<string, List<Nvals>> GenerateKernels(int nodeNum)
+        {
+            Dictionary<string, List<Nvals>> newKernels = new Dictionary<string, List<Nvals>>();
+            foreach (var NodeRule in CLRNodes[nodeNum].nRules)
             {
-                generate = true;
-                nextNode = 0;
+                char currAction = 'R';
+                Nvals newGenNval = new Nvals
+                {
+                    ruleName = NodeRule.ruleName,
+                    myProduction = NodeRule.myProduction,
+                    lookAhead = NodeRule.lookAhead,
+                    currPos = NodeRule.currPos + 1,
+                };
+                try
+                {
+                    string currVal = NodeRule.myProduction.elements[NodeRule.currPos].value;
+                    switch (NodeRule.myProduction.elements[NodeRule.currPos].type)
+                    {
+                        case "Nterm":
+                            currAction = 'G';
+                            break;
+                        case "Term":
+                            currAction = 'S';
+                            break;
+                    }
+                    //if (newGenNval.currPos == newGenNval.myProduction.elements.Count)
+                    //{
+                    //    currAction = 'R';
+                    //}
+                    if (newKernels.TryAdd(currVal, new List<Nvals> { newGenNval }))
+                    {
+                        CLRNodes[nodeNum].Movements.Add(currVal, new Action { pAction = currAction });
+                        //CLRNodes[0].Movements[currVal].direction = NodeAmount;
+                        //NodeAmount++;
+                    }
+                    else
+                    {
+                        newKernels[currVal].Add(newGenNval);
+                    }
+                }
+                catch (Exception)
+                {
+                    CLRNodes[nodeNum].Movements.Add("$", new Action { pAction = 'R' });
+                }
+               
+
+                
+                //generate = true;
+                //nextNode = 0;
+                //foreach (var node in CLRNodes)
+                //{
+                //    if (node.nRules[0].ToString() == item.GetNext() && node.numNode != CLRNodes[0].numNode)
+                //    {
+                //        nextNode = node.numNode;
+                //        generate = false;
+                //        break;
+                //    }
+                //}
+                //if (generate)
+                //{ 
+                //    CLRNodes[0].Movements.TryAdd(item.myProduction.elements[item.currPos], NodeAmount);
+                //}
+                //else
+                //{
+                //    CLRNodes[0].Movements.TryAdd(item.myProduction.elements[item.currPos], nextNode);
+                //}
+            }
+            return newKernels;
+        }
+        private void CheckNodeGen(int nodeNum)
+        {
+            bool generar = true;
+            foreach (var kernel in GenerateKernels(nodeNum))
+            {
+                string sKernel = "";
+                string sKernelComp = "";
+                foreach (var nval in kernel.Value)
+                {
+                    sKernel += nval.ToString();
+                }
                 foreach (var node in CLRNodes)
                 {
-                    if (node.nRules[0].ToString() == item.GetNext() && node.numNode != newNode.numNode)
+                    sKernelComp = "";
+                    foreach (var Nodenval in node.Kernels)
                     {
-                        nextNode = node.numNode;
-                        generate = false;
+                        sKernelComp += Nodenval.ToString();
+                    }
+                    if (sKernel == sKernelComp)
+                    {
+                        CLRNodes[nodeNum].Movements[kernel.Key].direction = node.numNode;
+                        generar = false;
                         break;
                     }
                 }
-                if (generate)
+                if (generar)
                 {
-                    newNode.Movements.TryAdd(item.myProduction.elements[item.currPos], NodeAmount);
+                    CLRNodes[nodeNum].Movements[kernel.Key].direction = NodeAmount;
+                    GenerateNode(kernel.Value);
                 }
-                else
-                {
-                    newNode.Movements.TryAdd(item.myProduction.elements[item.currPos], nextNode);
-                }
-            }
-            Console.WriteLine("fin");
-        }
 
+            }
+        }
 
         private List<string> GetLookAhead(Nvals currNval)
         {
             try
             {
-                if (currNval.myProduction.elements[currNval.currPos].type == "Nterm")
+                if (currNval.myProduction.elements[currNval.currPos + 1].type == "Nterm")
                 {
+                    //List<string> newLookAheads = new List<string>();
+                    //newLookAheads.AddRange();
                     return Firsts[currNval.myProduction.elements[currNval.currPos].value];
                 }
                 else
@@ -212,7 +286,7 @@ namespace YAYACC
             }
             catch (Exception)
             {
-                return new List<string> { "$" };
+                return currNval.lookAhead;
             }
         }
     }

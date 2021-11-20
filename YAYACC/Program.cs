@@ -36,6 +36,7 @@ namespace YAYACC
                 }
                 Console.WriteLine("-------------------");
                 Console.WriteLine(newGram.ToString());
+                newGram.GenerateFirsts();
                 newGram.GenerateCLR();
                 Console.WriteLine("fin");
             }
