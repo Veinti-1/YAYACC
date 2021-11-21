@@ -268,10 +268,6 @@ namespace YAYACC
         }
         private void CheckNodeGen(int nodeNum)
         {
-            if (nodeNum ==1)
-            {
-                Console.WriteLine();
-            }
             bool generar = true;
             foreach (var kernel in GenerateKernels(nodeNum))
             {
