@@ -181,6 +181,10 @@ namespace YAYACC
                                 Tresult.Value += '\'';
                                 _currState = 3;
                                 break;
+                            case 'e':
+                                Tresult.Value += "\\e";
+                                _currState = 3;
+                                break;
                             default:
                                 throw new Exception("Lex Error");
                         }
