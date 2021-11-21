@@ -37,37 +37,36 @@ namespace YAYACC
                 if (i == 0)
                 {
                     Console.WriteLine("No errors found");
+                    Console.WriteLine("-------------------");
+                    Console.WriteLine(newGram.ToString());
+                    newGram.GenerateCLR();
+                    Console.WriteLine("-------------------");
+                    Console.WriteLine("Enter input for the Grammar:");
+                    bool continueInput = true;
+                    do
+                    {
+                        if (newGram.Parse(Console.ReadLine()))
+                        {
+                            Console.WriteLine("Input is valid");
+                        }
+                        else
+                        {
+                            Console.WriteLine("Input is NOT valid");
+                        }
+                        Console.WriteLine("Enter new input for the Grammar? [Y/N]");
+                        if (Console.ReadLine().ToLower() == "N")
+                        {
+                            continueInput = false;
+                        }
+                        Console.Clear();
+                        Console.WriteLine("Enter input for the Grammar:");
+                    } while (continueInput);
                 }
-                Console.WriteLine("-------------------");
-                Console.WriteLine(newGram.ToString());
-                newGram.GenerateCLR();
-                Console.WriteLine("-------------------");
-                Console.WriteLine("Enter input for the Grammar");
-                bool continueInput = true;
-                do
-                {
-                    if (newGram.Parse(Console.ReadLine()))
-                    {
-                        Console.WriteLine("Input is valid");
-                    }
-                    else
-                    {
-                        Console.WriteLine("Input is NOT valid");
-                    }
-                    Console.WriteLine("Enter new input for the Grammar? [Y/N]");
-                    if (Console.ReadLine().ToLower() == "N")
-                    {
-                        continueInput = false;
-                    }
-                    Console.Clear();
-                } while (continueInput);
-               
             }
             else
             {
                 Console.WriteLine("Incorrect file extension, " + extension +" is not a valid extension");
             }
-            //C:\Users\Usuario\Downloads\prueba.y
             Console.ReadKey();
         }
     }
