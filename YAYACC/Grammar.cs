@@ -54,20 +54,23 @@ namespace YAYACC
                         {
                             return true;
                         }
-                        int i = currAction.ReduceProd.elements.Count - 1;
-                        do
+                        if (!(currAction.ReduceProd.elements.Count == 1 && currAction.ReduceProd.elements[0].value == "ε"))
                         {
-                            if (stack.Pop() == currAction.ReduceProd.elements[i].value)
+                            int i = currAction.ReduceProd.elements.Count - 1;
+                            do
                             {
-                                StateStack.Pop();
-                            }
-                            else
-                            {
-                                //throw new Exception("Invalid input for the grammar");
-                                return false;
-                            }
-                            i--;
-                        } while (i >= 0);
+                                if (stack.Pop() == currAction.ReduceProd.elements[i].value)
+                                {
+                                    StateStack.Pop();
+                                }
+                                else
+                                {
+                                    return false;
+                                }
+                                i--;
+                            } while (i >= 0);
+                        }
+                    
                         stack.Push(currAction.rName);
                         currAction = CLRNodes[StateStack.Peek()].Movements[stack.Peek()];
                         StateStack.Push(currAction.direction);
