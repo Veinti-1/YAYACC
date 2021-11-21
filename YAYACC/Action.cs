@@ -1,6 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Text;
+﻿
 
 namespace YAYACC
 {
@@ -10,5 +8,16 @@ namespace YAYACC
         public char pAction;
         public string rName;
         public Production ReduceProd;
+        /*
+              .-""""""-.
+            .'          '.
+           /   O    ---   \
+          :                :
+          |                |  
+          : ',          ,' :
+           \  '-......-'  /
+            '.          .'
+              '-......-'
+         */
     }
 }
