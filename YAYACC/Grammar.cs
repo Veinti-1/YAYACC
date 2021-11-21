@@ -90,7 +90,7 @@ namespace YAYACC
                 lookAhead = new List<string> { "$" },
             };
             GenerateNode(new List<Nvals> { newNval });
-           
+
             Console.WriteLine("");
             int i = 0;
             do
@@ -114,7 +114,6 @@ namespace YAYACC
 
             newNode.nRules.AddRange(Kernels);
             CLRNodes.Add(newNode);
-
 
             int i = 0;
             do
@@ -163,9 +162,6 @@ namespace YAYACC
 
                 i++;
             } while (i < newNode.nRules.Count);
-
-
-
         }
 
         private Dictionary<string, List<Nvals>> GenerateKernels(int nodeNum)
@@ -228,20 +224,32 @@ namespace YAYACC
                 string sKernelComp = "";
                 foreach (var nval in kernel.Value)
                 {
+                    if (nval.myProduction.elements.Any(x => x.value == "ε"))
+                    {
+                        generar = false;
+                        foreach (var item in nval.lookAhead)
+                        {
+                            CLRNodes[nodeNum].Movements.Add(item, new Action { pAction = 'R' });
+                        }
+                        break;
+                    }
                     sKernel += nval.ToString();
                 }
-                foreach (var node in CLRNodes)
+                if (generar)
                 {
-                    sKernelComp = "";
-                    foreach (var Nodenval in node.Kernels)
+                    foreach (var node in CLRNodes)
                     {
-                        sKernelComp += Nodenval.ToString();
-                    }
-                    if (sKernel == sKernelComp)
-                    {
-                        CLRNodes[nodeNum].Movements[kernel.Key].direction = node.numNode;
-                        generar = false;
-                        break;
+                        sKernelComp = "";
+                        foreach (var Nodenval in node.Kernels)
+                        {
+                            sKernelComp += Nodenval.ToString();
+                        }
+                        if (sKernel == sKernelComp)
+                        {
+                            CLRNodes[nodeNum].Movements[kernel.Key].direction = node.numNode;
+                            generar = false;
+                            break;
+                        }
                     }
                 }
                 if (generar)
@@ -259,20 +267,40 @@ namespace YAYACC
                 if (currNval.myProduction.elements[currNval.currPos + 1].type == "Nterm")
                 {
                     List<string> newLookAheads = new List<string>();
-                    if (currNval.myProduction.elements[currNval.currPos].type == "Nterm")
+
+                    int i = 1;
+                    do
                     {
-                        if (Firsts[currNval.myProduction.elements[currNval.currPos].value].Any(x => x == "\\e"))
+                        try
                         {
-                            newLookAheads.AddRange(currNval.lookAhead);
+                            if (currNval.myProduction.elements[currNval.currPos + i].type == "Nterm")
+                            {
+                                if (Firsts[currNval.myProduction.elements[currNval.currPos + i].value].Any(x => x == "ε"))
+                                {
+                                    newLookAheads.AddRange(currNval.lookAhead);
+                                }
+                            }
+                            else
+                            {
+                                newLookAheads.Add(currNval.myProduction.elements[currNval.currPos + 2].value);
+                                break;
+                            }
                         }
-                        
-                    }
-                    newLookAheads.AddRange(Firsts[currNval.myProduction.elements[currNval.currPos].value]);
+                        catch (Exception)
+                        {
+                            break;
+                        }
+                        i++;
+                    } while (true);
+
+                    newLookAheads.AddRange(Firsts[currNval.myProduction.elements[currNval.currPos + 1].value]);
+                    newLookAheads = newLookAheads.Distinct().ToList();
+                    newLookAheads.Remove("ε");
                     return newLookAheads;
                 }
                 else
                 {
-                    return new List<string> { currNval.myProduction.elements[currNval.currPos].value };
+                    return new List<string> { currNval.myProduction.elements[currNval.currPos + 1].value };
                 }
             }
             catch (Exception)

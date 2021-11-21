@@ -182,7 +182,7 @@ namespace YAYACC
                                 _currState = 3;
                                 break;
                             case 'e':
-                                Tresult.Value += "\\e";
+                                Tresult.Value += 'ε';
                                 _currState = 3;
                                 break;
                             default:
