@@ -83,8 +83,6 @@ namespace YAYACC
             }
             return false;
         }
-
-
         private void GenerateFirsts()
         {
             Firsts = new Dictionary<string, List<string>>();
@@ -243,7 +241,7 @@ namespace YAYACC
                             currAction = 'S';
                             break;
                     }
-                    if (newKernels.TryAdd(currVal, new List<Nvals> { newGenNval }))
+                    if (currVal != "ε" && newKernels.TryAdd(currVal, new List<Nvals> { newGenNval }))
                     {
                         CLRNodes[nodeNum].Movements.Add(currVal, new Action { pAction = currAction });
                     }
@@ -288,7 +286,7 @@ namespace YAYACC
                         generar = false;
                         foreach (var item in nval.lookAhead)
                         {
-                            CLRNodes[nodeNum].Movements.Add(item, new Action { pAction = 'R' });
+                            CLRNodes[nodeNum].Movements.Add(item, new Action { pAction = 'R' , rName = nval.ruleName, ReduceProd = nval.myProduction });
                         }
                         break;
                     }
