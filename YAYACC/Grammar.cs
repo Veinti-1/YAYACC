@@ -11,6 +11,7 @@ namespace YAYACC
         public Dictionary<char, char> Alphabet;
         private Dictionary<string, List<string>> Firsts;
         private List<Node> CLRNodes;
+        private List<Node> LALRNodes;
         private int NodeAmount = 0;
         private Stack<string> stack;
         private Stack<int> StateStack;
@@ -39,7 +40,7 @@ namespace YAYACC
         {
             try
             {
-                Action currAction = CLRNodes[currState].Movements[Convert.ToString(input[0])];
+                Action currAction = LALRNodes.Find(x => x.numNode == currState).Movements[Convert.ToString(input[0])];
                 switch (currAction.pAction)
                 {
                     case 'S':
@@ -69,9 +70,9 @@ namespace YAYACC
                                 i--;
                             } while (i >= 0);
                         }
-                    
+
                         stack.Push(currAction.rName);
-                        currAction = CLRNodes[StateStack.Peek()].Movements[stack.Peek()];
+                        currAction = LALRNodes.Find(x => x.numNode == StateStack.Peek()).Movements[stack.Peek()];
                         StateStack.Push(currAction.direction);
                         return Parse(input, currAction.direction);
                 }
@@ -109,7 +110,7 @@ namespace YAYACC
                 }
             }
         }
-        public void GenerateCLR()
+        private void GenerateCLR()
         {
             GenerateFirsts();
             CLRNodes = new List<Node>();
@@ -134,7 +135,6 @@ namespace YAYACC
                 }
             });
 
-
             Nvals newNval = new Nvals
             {
                 ruleName = "0",
@@ -151,6 +151,103 @@ namespace YAYACC
                 i++;
             } while (i < CLRNodes.Count);
             Console.WriteLine("");
+        }
+        public void GenerateLALR()
+        {
+            GenerateCLR();
+            LALRNodes = new List<Node>();
+            List<int> removedDups = new List<int>();
+            foreach (var node in CLRNodes)
+            {
+                for (int i = 0; i < CLRNodes.Count; i++)
+                {
+                    string a = node.GetKernelStr();
+                    string b = CLRNodes[i].GetKernelStr();
+                    if (a == b && node.numNode != i)
+                    {
+                        if (!removedDups.Any(x => x == node.numNode))
+                        {
+                            removedDups.Add(node.numNode);
+                            removedDups.Add(i);
+                            string newNum = "";
+                            newNum += node.numNode;
+                            newNum += i;
+                            Node fusedNode = new Node
+                            {
+                                Kernels = node.Kernels,
+                                numNode = Convert.ToInt32(newNum),
+                                nRules = node.nRules,
+                                Movements = node.Movements
+                            };
+                            LALRNodes.Add(fusedNode);
+                            int j = 0;
+                            foreach (var nNval in LALRNodes[LALRNodes.Count - 1].nRules)
+                            {
+                                nNval.lookAhead.AddRange(CLRNodes[i].nRules[j].lookAhead);
+                                nNval.lookAhead = nNval.lookAhead.Distinct().ToList();
+                                if (nNval.action == 'R')
+                                {
+                                    foreach (var item in nNval.lookAhead)
+                                    {
+                                        LALRNodes[LALRNodes.Count - 1].Movements.TryAdd(item, new Action { pAction = 'R', rName = nNval.ruleName, ReduceProd = nNval.myProduction });
+                                    }
+                                }
+                                j++;
+                            }
+                        }
+                    }
+                }
+            }
+            foreach (var node in LALRNodes)
+            {
+                foreach (var item in node.Movements)
+                {
+                    int transition = item.Value.direction;
+                    int index = removedDups.IndexOf(transition);
+                    if (index >= 0)
+                    {
+                        string numConcat = "";
+                        if (index % 2 == 0)
+                        {
+                            numConcat += removedDups[index];
+                            numConcat += removedDups[index + 1];
+                        }
+                        else
+                        {
+                            numConcat += removedDups[index - 1];
+                            numConcat += removedDups[index];
+                        }
+                        item.Value.direction = Convert.ToInt32(numConcat);
+                    }
+                }
+            }
+            for (int i = 0; i < CLRNodes.Count; i++)
+            {
+                if (!removedDups.Any(x => x == i))
+                {
+                    foreach (var item in CLRNodes[i].Movements)
+                    {
+                        int transition = item.Value.direction;
+                        int index = removedDups.IndexOf(transition);
+                        if (index >= 0)
+                        {
+                            string numConcat = "";
+                            if (index % 2 == 0)
+                            {
+                                numConcat += removedDups[index];
+                                numConcat += removedDups[index + 1];
+                            }
+                            else
+                            {
+                                numConcat += removedDups[index - 1];
+                                numConcat += removedDups[index];
+                            }
+                            item.Value.direction = Convert.ToInt32(numConcat);
+                        }
+                    }
+                    LALRNodes.Add(CLRNodes[i]);
+                }
+            }
         }
         private void GenerateNode(List<Nvals> Kernels)
         {
@@ -281,7 +378,7 @@ namespace YAYACC
                         generar = false;
                         foreach (var item in nval.lookAhead)
                         {
-                            CLRNodes[nodeNum].Movements.Add(item, new Action { pAction = 'R' , rName = nval.ruleName, ReduceProd = nval.myProduction });
+                            CLRNodes[nodeNum].Movements.Add(item, new Action { pAction = 'R', rName = nval.ruleName, ReduceProd = nval.myProduction });
                         }
                         break;
                     }

@@ -38,7 +38,7 @@ namespace YAYACC
                     Console.WriteLine("No errors found");
                     Console.WriteLine("-------------------");
                     Console.WriteLine(newGram.ToString());
-                    newGram.GenerateCLR();
+                    newGram.GenerateLALR();
                     Console.WriteLine("-------------------");
                     Console.WriteLine("Enter input for the Grammar:");
                     bool continueInput = true;
