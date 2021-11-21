@@ -7,12 +7,12 @@ namespace YAYACC
 {
     class Grammar
     {
-        public Rule inicial;
-        public List<Rule> Rules;
-        public Dictionary<char, char> Alphabet;
-        public Dictionary<string, List<string>> Firsts;
-        public List<Node> CLRNodes;
-        int NodeAmount = 0;
+        private Rule inicial;
+        private List<Rule> Rules;
+        private Dictionary<char, char> Alphabet;
+        private Dictionary<string, List<string>> Firsts;
+        private List<Node> CLRNodes;
+        private int NodeAmount = 0;
 
         public override string ToString()
         {
