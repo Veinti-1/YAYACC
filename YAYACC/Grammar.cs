@@ -7,9 +7,9 @@ namespace YAYACC
 {
     class Grammar
     {
-        private Rule inicial;
-        private List<Rule> Rules;
-        private Dictionary<char, char> Alphabet;
+        public Rule inicial;
+        public List<Rule> Rules;
+        public Dictionary<char, char> Alphabet;
         private Dictionary<string, List<string>> Firsts;
         private List<Node> CLRNodes;
         private int NodeAmount = 0;
