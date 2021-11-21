@@ -13,7 +13,8 @@ namespace YAYACC
         private Dictionary<string, List<string>> Firsts;
         private List<Node> CLRNodes;
         private int NodeAmount = 0;
-
+        private Stack<string> stack;
+        private Stack<int> StateStack;
         public override string ToString()
         {
             string sOutput = "Inicial Rule: " + inicial.rName + "\n  Rules: \n";
@@ -28,6 +29,59 @@ namespace YAYACC
             }
             return sOutput;
         }
+        public bool Parse(string input)
+        {
+            stack = new Stack<string>();
+            StateStack = new Stack<int>();
+            StateStack.Push(0);
+            return Parse(input + "$", 0);
+        }
+        private bool Parse(string input, int currState)
+        {
+            try
+            {
+                Action currAction = CLRNodes[currState].Movements[Convert.ToString(input[0])];
+                switch (currAction.pAction)
+                {
+                    case 'S':
+                        stack.Push(Convert.ToString(input[0]));
+                        StateStack.Push(currAction.direction);
+                        return Parse(input.Substring(1), currAction.direction);
+                    case 'G':
+                        return Parse(input, currAction.direction);
+                    case 'R':
+                        if (currAction.rName == "0" && input[0] == '$')
+                        {
+                            return true;
+                        }
+                        int i = currAction.ReduceProd.elements.Count - 1;
+                        do
+                        {
+                            if (stack.Pop() == currAction.ReduceProd.elements[i].value)
+                            {
+                                StateStack.Pop();
+                            }
+                            else
+                            {
+                                //throw new Exception("Invalid input for the grammar");
+                                return false;
+                            }
+                            i--;
+                        } while (i >= 0);
+                        stack.Push(currAction.rName);
+                        currAction = CLRNodes[StateStack.Peek()].Movements[stack.Peek()];
+                        StateStack.Push(currAction.direction);
+                        return Parse(input, currAction.direction);
+                }
+            }
+            catch (Exception)
+            {
+                return false;
+            }
+            return false;
+        }
+
+
         private void GenerateFirsts()
         {
             Firsts = new Dictionary<string, List<string>>();
@@ -36,7 +90,6 @@ namespace YAYACC
                 GetFirst(rule);
             }
         }
-
         private void GetFirst(Rule currRule)
         {
             Firsts.TryAdd(currRule.rName, new List<string>());
@@ -56,7 +109,6 @@ namespace YAYACC
                 }
             }
         }
-
         public void GenerateCLR()
         {
             GenerateFirsts();
@@ -163,7 +215,6 @@ namespace YAYACC
                 i++;
             } while (i < newNode.nRules.Count);
         }
-
         private Dictionary<string, List<Nvals>> GenerateKernels(int nodeNum)
         {
             Dictionary<string, List<Nvals>> newKernels = new Dictionary<string, List<Nvals>>();
@@ -204,7 +255,7 @@ namespace YAYACC
                     {
                         foreach (var item in NodeRule.lookAhead)
                         {
-                            CLRNodes[nodeNum].Movements.Add(item, new Action { pAction = 'R' });
+                            CLRNodes[nodeNum].Movements.Add(item, new Action { pAction = 'R', rName = NodeRule.ruleName, ReduceProd = NodeRule.myProduction });
                         }
                     }
                     catch (Exception)
@@ -217,9 +268,14 @@ namespace YAYACC
         }
         private void CheckNodeGen(int nodeNum)
         {
+            if (nodeNum ==1)
+            {
+                Console.WriteLine();
+            }
             bool generar = true;
             foreach (var kernel in GenerateKernels(nodeNum))
             {
+                generar = true;
                 string sKernel = "";
                 string sKernelComp = "";
                 foreach (var nval in kernel.Value)
@@ -259,7 +315,6 @@ namespace YAYACC
                 }
             }
         }
-
         private List<string> GetLookAhead(Nvals currNval)
         {
             try
