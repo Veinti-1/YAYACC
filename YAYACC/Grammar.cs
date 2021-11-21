@@ -204,11 +204,17 @@ namespace YAYACC
                 }
                 catch (Exception)
                 {
-                    foreach (var item in NodeRule.lookAhead)
+                    try
                     {
-                        CLRNodes[nodeNum].Movements.Add(item, new Action { pAction = 'R' });
+                        foreach (var item in NodeRule.lookAhead)
+                        {
+                            CLRNodes[nodeNum].Movements.Add(item, new Action { pAction = 'R' });
+                        }
                     }
-                    
+                    catch (Exception)
+                    {
+                        throw new Exception("Shift Reduce Conflict");
+                    }
                 }
             }
             return newKernels;
@@ -252,9 +258,17 @@ namespace YAYACC
             {
                 if (currNval.myProduction.elements[currNval.currPos + 1].type == "Nterm")
                 {
-                    //List<string> newLookAheads = new List<string>();
-                    //newLookAheads.AddRange();
-                    return Firsts[currNval.myProduction.elements[currNval.currPos].value];
+                    List<string> newLookAheads = new List<string>();
+                    if (currNval.myProduction.elements[currNval.currPos].type == "Nterm")
+                    {
+                        if (Firsts[currNval.myProduction.elements[currNval.currPos].value].Any(x => x == "\\e"))
+                        {
+                            newLookAheads.AddRange(currNval.lookAhead);
+                        }
+                        
+                    }
+                    newLookAheads.AddRange(Firsts[currNval.myProduction.elements[currNval.currPos].value]);
+                    return newLookAheads;
                 }
                 else
                 {
