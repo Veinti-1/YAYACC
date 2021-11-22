@@ -56,7 +56,7 @@ namespace YAYACC
                             Console.WriteLine("Input is NOT valid");
                         }
                         Console.WriteLine("Enter new input for the Grammar? [Y/N]");
-                        if (Console.ReadLine().ToLower() == "N")
+                        if (Console.ReadLine().ToLower() == "n")
                         {
                             continueInput = false;
                         }

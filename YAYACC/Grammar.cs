@@ -372,7 +372,7 @@ namespace YAYACC
                             }
                             else
                             {
-                                Console.WriteLine("igual");
+                                //Console.WriteLine("igual");
                             }
                         }
 
