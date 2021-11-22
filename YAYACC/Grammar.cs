@@ -76,7 +76,7 @@ namespace YAYACC
                             WriteFile(path);
                             return true;
                         }
-                        output += "R";
+                        output += "R"+ GetRuleNum(currAction.rName, currAction.ReduceProd);
                         steps.Add(output);
                         if (!(currAction.ReduceProd.elements.Count == 1 && currAction.ReduceProd.elements[0].value == "ε"))
                         {
@@ -101,6 +101,18 @@ namespace YAYACC
                         stack.Push(currAction.rName);
                         currAction = LALRNodes.Find(x => x.numNode == StateStack.Peek()).Movements[stack.Peek()];
                         StateStack.Push(currAction.direction);
+                        output = "";
+                        foreach (var item in StateStack)
+                        {
+                            output += item + " ";
+                        }
+                        output += ", ";
+                        foreach (var item in stack)
+                        {
+                            output += item + " ";
+                        }
+                        output += ", " + input + ", "+ StateStack.Peek();
+                        steps.Add(output);
                         return Parse(input, currAction.direction, path);
                 }
             }
@@ -128,8 +140,30 @@ namespace YAYACC
             catch (Exception)
             {
                 Console.WriteLine("Specified does not exist");
+            }  
+        }
+        private int GetRuleNum(string rName, Production prod)
+        {
+            int num = 1;
+            foreach (var rule in Rules)
+            {
+                if (rule.rName == rName)
+                {
+                    foreach (var product in rule.Productions)
+                    {
+                        if (product.ToString() == prod.ToString())
+                        {
+                            return num;
+                        }
+                        num++;
+                    }
+                }
+                else
+                {
+                    num += rule.Productions.Count;
+                }
             }
-            
+            return num;
         }
         private void GenerateFirsts()
         {
