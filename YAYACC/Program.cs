@@ -44,7 +44,10 @@ namespace YAYACC
                     bool continueInput = true;
                     do
                     {
-                        if (newGram.Parse(Console.ReadLine()))
+                        string input = Console.ReadLine();
+                        Console.WriteLine("Enter path for the output file:");
+                        string pathOut = Console.ReadLine();
+                        if (newGram.Parse(input, pathOut))
                         {
                             Console.WriteLine("Input is valid");
                         }

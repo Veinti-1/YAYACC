@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
 
 namespace YAYACC
@@ -15,6 +16,7 @@ namespace YAYACC
         private int NodeAmount = 0;
         private Stack<string> stack;
         private Stack<int> StateStack;
+        private List<string> steps;
         public override string ToString()
         {
             string sOutput = "Inicial Rule: " + inicial.rName + "\n  Rules: \n";
@@ -29,31 +31,53 @@ namespace YAYACC
             }
             return sOutput;
         }
-        public bool Parse(string input)
+        public bool Parse(string input, string path)
         {
+            steps = new List<string> { "State Stack, Stack, Input, Action"};
             stack = new Stack<string>();
             StateStack = new Stack<int>();
             StateStack.Push(0);
-            return Parse(input + "$", 0);
+            return Parse(input + "$", 0, path);
         }
-        private bool Parse(string input, int currState)
+        private bool Parse(string input, int currState, string path)
         {
+            string output = "";
+            foreach (var item in StateStack)
+            {
+                output += item + " ";
+            }
+            output += ", ";
+            foreach (var item in stack)
+            {
+                output += item + " ";
+            }
+            output += ", " + input + ", ";
+
             try
             {
                 Action currAction = LALRNodes.Find(x => x.numNode == currState).Movements[Convert.ToString(input[0])];
                 switch (currAction.pAction)
                 {
                     case 'S':
+                        output += "S"+currAction.direction;
+                        steps.Add(output);
                         stack.Push(Convert.ToString(input[0]));
                         StateStack.Push(currAction.direction);
-                        return Parse(input.Substring(1), currAction.direction);
+                        return Parse(input.Substring(1), currAction.direction, path);
                     case 'G':
-                        return Parse(input, currAction.direction);
+                        output += currAction.direction;
+                        steps.Add(output);
+                        return Parse(input, currAction.direction, path);
                     case 'R':
                         if (currAction.rName == "0" && input[0] == '$')
                         {
+                            output += "ACCEPT";
+                            steps.Add(output);
+                            WriteFile(path);
                             return true;
                         }
+                        output += "R";
+                        steps.Add(output);
                         if (!(currAction.ReduceProd.elements.Count == 1 && currAction.ReduceProd.elements[0].value == "ε"))
                         {
                             int i = currAction.ReduceProd.elements.Count - 1;
@@ -65,6 +89,9 @@ namespace YAYACC
                                 }
                                 else
                                 {
+                                    output += "ERROR";
+                                    steps.Add(output);
+                                    WriteFile(path);
                                     return false;
                                 }
                                 i--;
@@ -74,14 +101,35 @@ namespace YAYACC
                         stack.Push(currAction.rName);
                         currAction = LALRNodes.Find(x => x.numNode == StateStack.Peek()).Movements[stack.Peek()];
                         StateStack.Push(currAction.direction);
-                        return Parse(input, currAction.direction);
+                        return Parse(input, currAction.direction, path);
                 }
             }
             catch (Exception)
             {
+                output += "ERROR";
+                steps.Add(output);
+                WriteFile(path);
                 return false;
             }
             return false;
+        }
+        private void WriteFile(string path)
+        {
+            try
+            {
+                using (StreamWriter writer = new StreamWriter(path + @"\output.csv"))
+                {
+                    foreach (var item in steps)
+                    {
+                        writer.WriteLine(item);
+                    }
+                }
+            }
+            catch (Exception)
+            {
+                Console.WriteLine("Specified does not exist");
+            }
+            
         }
         private void GenerateFirsts()
         {
